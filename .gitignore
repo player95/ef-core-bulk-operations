@@ -1,0 +1,9 @@
+.vs/
+Tanneryd.BulkOperations.EFCore/Tanneryd.BulkOperations.EFCore.Tests/bin/
+Tanneryd.BulkOperations.EFCore/Tanneryd.BulkOperations.EFCore.Tests/Generated/
+Tanneryd.BulkOperations.EFCore/.idea/
+Tanneryd.BulkOperations.EFCore/Tanneryd.BulkOperations.EFCore.sln.DotSettings.user
+*.user
+Tanneryd.BulkOperations.EFCore/Tanneryd.BulkOperations.EFCore.Tests/obj/
+Tanneryd.BulkOperations.EFCore/Tanneryd.BulkOperations.EFCore/bin/
+Tanneryd.BulkOperations.EFCore/Tanneryd.BulkOperations.EFCore/obj/
