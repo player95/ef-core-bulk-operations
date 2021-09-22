@@ -31,12 +31,19 @@ namespace Tanneryd.BulkOperations.EFCore.Model
 
         public IList<T> Items { get; set; }
         public KeyPropertyMapping[] KeyPropertyMappings { get; set; }
+        
+        /// <summary>
+        /// Mappings for the columns we would like to update on our
+        /// local entities if they match existing entities in the database.
+        /// </summary>
+        public KeyPropertyMapping[] ColumnPropertyMappings { get; set; }
         public SqlTransaction Transaction { get; set; }
         public TimeSpan CommandTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
         public BulkSelectRequest()
         {
             KeyPropertyMappings = new KeyPropertyMapping[0];
+            ColumnPropertyMappings = new KeyPropertyMapping[0];
             Items = new T[0];
         }
     }

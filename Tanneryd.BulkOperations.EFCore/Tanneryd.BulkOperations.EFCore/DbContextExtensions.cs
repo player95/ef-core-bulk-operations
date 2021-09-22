@@ -974,9 +974,11 @@ namespace Tanneryd.BulkOperations.EFCore
                     return
                         $"([t0].[{c.TableColumn.Column.Name}] = [t1].[{c.TableColumn.Column.Name}] OR ([t0].[{c.TableColumn.Column.Name}] IS NULL AND [t1].[{c.TableColumn.Column.Name}] IS NULL))";
                 });
-
+                
                 var conditionStatementsSql = string.Join(" AND ", conditionStatements);
-                var query = $@"SELECT DISTINCT [t0].[rowno]
+                // We could improve performance here by replacing "[t1].*" below with the actual
+                // columns as specified in request.ColumnPropertyMappings.
+                var query = $@"SELECT DISTINCT [t0].[rowno], [t1].*
                                FROM {tempTableName} AS [t0]
                                INNER JOIN {tableName.Fullname} AS [t1] ON {conditionStatementsSql}";
                 
@@ -994,6 +996,7 @@ namespace Tanneryd.BulkOperations.EFCore
                                {fkJoinStatement}
                                {fkWhereStatement}";
                 }
+                query += "\nORDER BY [t0].[rowno]";
                 var cmd = CreateSqlCommand(query, conn, request.Transaction, request.CommandTimeout);
 
                 var existingEntities = new List<T1>();
@@ -1003,6 +1006,12 @@ namespace Tanneryd.BulkOperations.EFCore
                     while (sqlDataReader.Read())
                     {
                         var rowNo = (int)sqlDataReader[0];
+                        var item = items[rowNo];
+                        foreach (var cpm in request.ColumnPropertyMappings)
+                        {
+                            SetProperty(cpm.ItemPropertyName, item, sqlDataReader[cpm.EntityPropertyName]);    
+                        }
+                        
                         existingEntities.Add(items[rowNo]);
                     }
                 }
