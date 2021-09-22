@@ -6,6 +6,11 @@
     <Authors>Måns Tånneryd</Authors>
     <Company>Tånneryd IT</Company>
     <Product>BulkOperations for EFCore</Product>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE-2.0.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/mtanneryd/ef-core-bulk-operations</PackageProjectUrl>
+    <Description>Provides bulk operations for EF Core</Description>
+    <Copyright>Copyright ©  2017-2021 Tånneryd IT AB</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +25,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE-2.0.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
