@@ -20,6 +20,12 @@ namespace Tanneryd.BulkOperations.EFCore
             LoadMappings();
         }
 
+        public bool HasMappings(Type type)
+        {
+            return _mappingsByType.ContainsKey(type);
+        }
+
+
         public Mappings GetMappings(Type type)
         {
             return _mappingsByType[type];
@@ -28,7 +34,12 @@ namespace Tanneryd.BulkOperations.EFCore
         private void LoadMappings()
         {
             _mappingsByType = new Dictionary<Type, Mappings>();
-            foreach (var entityType in _ctx.Model.GetEntityTypes())
+
+            // Skip all views.
+            var entityTypes = _ctx.Model.GetEntityTypes()
+                .Where(t=>t.GetViewName() == null)
+                .ToArray();
+            foreach (var entityType in entityTypes)
             {
                 var m = new Mappings();
                 if (_mappingsByType.ContainsKey(entityType.ClrType))
@@ -52,7 +63,8 @@ namespace Tanneryd.BulkOperations.EFCore
                 var tableColumnMappings = new List<TableColumnMapping>();
                 var properties = entityType
                     .GetProperties()
-                    .Where(p => p.ValueGenerated == ValueGenerated.Never || p.IsPrimaryKey());
+                    .Where(p => p.ValueGenerated == ValueGenerated.Never || p.IsPrimaryKey())
+                    ;
                 foreach (var p in properties)
                 {
                     var tableColumnMapping = new TableColumnMapping();

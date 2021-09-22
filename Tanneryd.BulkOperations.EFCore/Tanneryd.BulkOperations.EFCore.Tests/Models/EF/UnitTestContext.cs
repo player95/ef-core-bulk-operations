@@ -44,6 +44,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests
         public DbSet<Number> Numbers { get; set; } // Number
         public DbSet<OfficeAssignment> OfficeAssignments { get; set; } // OfficeAssignment
         public DbSet<Parity> Parities { get; set; } // Parity
+        public DbSet<Contact> Contacts { get; set; } // Contact
         public DbSet<Person> People { get; set; } // Person
         public DbSet<PlayerWithDbGeneratedGuid> PlayerWithDbGeneratedGuids { get; set; } // PlayerWithDbGeneratedGuid
         public DbSet<PlayerWithUserGeneratedGuid> PlayerWithUserGeneratedGuids { get; set; } // PlayerWithUserGeneratedGuid
@@ -104,6 +105,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests
             modelBuilder.ApplyConfiguration(new NumberConfiguration());
             modelBuilder.ApplyConfiguration(new OfficeAssignmentConfiguration());
             modelBuilder.ApplyConfiguration(new ParityConfiguration());
+            modelBuilder.ApplyConfiguration(new ContactConfiguration());
             modelBuilder.ApplyConfiguration(new PersonConfiguration());
             modelBuilder.ApplyConfiguration(new PlayerWithDbGeneratedGuidConfiguration());
             modelBuilder.ApplyConfiguration(new PlayerWithUserGeneratedGuidConfiguration());

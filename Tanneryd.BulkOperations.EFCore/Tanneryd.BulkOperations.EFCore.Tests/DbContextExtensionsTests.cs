@@ -56,5 +56,15 @@ namespace Tanneryd.BulkOperations.EFCore.Tests
             }
         }
 
+        [TestMethod]
+        public void SkipViewsInMappingExtractor()
+        {
+            using (var ctx = new UnitTestContext())
+            {
+                var extractor = new MappingsExtractor(ctx);
+                var hasMappings = extractor.HasMappings(typeof(Contact));
+                Assert.IsFalse(hasMappings);
+            }
+        }
     }
 }

@@ -10,7 +10,7 @@ using Tanneryd.BulkOperations.EFCore.Tests;
 namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 {
     [DbContext(typeof(UnitTestContext))]
-    [Migration("20210223180434_InitialMigration")]
+    [Migration("20210922065142_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,16 +18,31 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("ProductVersion", "5.0.10")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("PostVisitor", b =>
+                {
+                    b.Property<Guid>("PostsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VisitorsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("PostsId", "VisitorsId");
+
+                    b.HasIndex("VisitorsId");
+
+                    b.ToTable("PostVisitor");
+                });
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.BatchInvoice", b =>
                 {
-                    b.Property<Guid>("PrimaryKey")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PrimaryKey");
 
-                    b.HasKey("PrimaryKey")
+                    b.HasKey("Id")
                         .HasName("PK_dbo.BatchInvoice")
                         .IsClustered();
 
@@ -36,7 +51,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.BatchInvoiceItem", b =>
                 {
-                    b.Property<Guid>("PrimaryKey")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PrimaryKey");
 
@@ -48,7 +63,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("InvoiceId");
 
-                    b.HasKey("PrimaryKey")
+                    b.HasKey("Id")
                         .HasName("PK_dbo.BatchInvoiceItem")
                         .IsClustered();
 
@@ -249,6 +264,21 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                     b.ToTable("CompositePrime", "dbo");
                 });
 
+            modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Contact", b =>
+                {
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("FirstName");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("LastName");
+
+                    b.ToView("Contact", "dbo");
+                });
+
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Coordinate", b =>
                 {
                     b.Property<int>("Id")
@@ -437,7 +467,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Invoice", b =>
                 {
-                    b.Property<Guid>("PrimaryKey")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PrimaryKey");
 
@@ -454,7 +484,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                         .HasColumnType("decimal(19,2)")
                         .HasColumnName("Tax");
 
-                    b.HasKey("PrimaryKey")
+                    b.HasKey("Id")
                         .HasName("PK_dbo.Invoice")
                         .IsClustered();
 
@@ -494,11 +524,11 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Journal", b =>
                 {
-                    b.Property<Guid>("PrimaryKey")
+                    b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("PrimaryKey");
 
-                    b.HasKey("PrimaryKey")
+                    b.HasKey("Id")
                         .HasName("PK_dbo.Journal")
                         .IsClustered();
 
@@ -1025,17 +1055,32 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                     b.ToTable("VisitorPosts", "dbo");
                 });
 
+            modelBuilder.Entity("PostVisitor", b =>
+                {
+                    b.HasOne("Tanneryd.BulkOperations.EFCore.Tests.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tanneryd.BulkOperations.EFCore.Tests.Visitor", null)
+                        .WithMany()
+                        .HasForeignKey("VisitorsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.BatchInvoiceItem", b =>
                 {
                     b.HasOne("Tanneryd.BulkOperations.EFCore.Tests.BatchInvoice", "BatchInvoice")
-                        .WithMany("BatchInvoiceItems")
+                        .WithMany("Invoices")
                         .HasForeignKey("BatchInvoiceId")
                         .HasConstraintName("FK_dbo.BatchInvoiceItem_dbo.BatchInvoice_BatchInvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Tanneryd.BulkOperations.EFCore.Tests.Invoice", "Invoice")
-                        .WithMany("BatchInvoiceItems")
+                        .WithMany("BatchInvoices")
                         .HasForeignKey("InvoiceId")
                         .HasConstraintName("FK_dbo.BatchInvoiceItem_dbo.Invoice_InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1179,7 +1224,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.InvoiceItem", b =>
                 {
                     b.HasOne("Tanneryd.BulkOperations.EFCore.Tests.Invoice", "Invoice")
-                        .WithMany("InvoiceItems")
+                        .WithMany("Journals")
                         .HasForeignKey("InvoiceId")
                         .HasConstraintName("FK_dbo.InvoiceItem_dbo.Invoice_InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1330,7 +1375,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.BatchInvoice", b =>
                 {
-                    b.Navigation("BatchInvoiceItems");
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Blog", b =>
@@ -1386,9 +1431,9 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Invoice", b =>
                 {
-                    b.Navigation("BatchInvoiceItems");
+                    b.Navigation("BatchInvoices");
 
-                    b.Navigation("InvoiceItems");
+                    b.Navigation("Journals");
                 });
 
             modelBuilder.Entity("Tanneryd.BulkOperations.EFCore.Tests.Journal", b =>

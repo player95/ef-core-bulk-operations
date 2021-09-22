@@ -675,6 +675,33 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PostVisitor",
+                schema: "dbo",
+                columns: table => new
+                {
+                    PostsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    VisitorsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostVisitor", x => new { x.PostsId, x.VisitorsId });
+                    table.ForeignKey(
+                        name: "FK_PostVisitor_Post_PostsId",
+                        column: x => x.PostsId,
+                        principalSchema: "dbo",
+                        principalTable: "Post",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PostVisitor_Visitor_VisitorsId",
+                        column: x => x.VisitorsId,
+                        principalSchema: "dbo",
+                        principalTable: "Visitor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "VisitorPosts",
                 schema: "dbo",
                 columns: table => new
@@ -953,6 +980,12 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                 column: "BlogId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PostVisitor_VisitorsId",
+                schema: "dbo",
+                table: "PostVisitor",
+                column: "VisitorsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NumberId",
                 schema: "dbo",
                 table: "Prime",
@@ -975,6 +1008,8 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
                 schema: "dbo",
                 table: "VisitorPosts",
                 column: "VisitorId");
+
+            migrationBuilder.Sql("CREATE VIEW Contact AS SELECT FirstName, LastName FROM Person");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -1037,6 +1072,10 @@ namespace Tanneryd.BulkOperations.EFCore.Tests.Migrations
 
             migrationBuilder.DropTable(
                 name: "Point",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "PostVisitor",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
