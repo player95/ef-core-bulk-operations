@@ -43,9 +43,9 @@ namespace Tanneryd.BulkOperations.EFCore.Model
 
         public BulkSelectRequest()
         {
-            KeyPropertyMappings = new KeyPropertyMapping[0];
-            ColumnPropertyMappings = new KeyPropertyMapping[0];
-            Items = new T[0];
+            KeyPropertyMappings = Array.Empty<KeyPropertyMapping>();
+            ColumnPropertyMappings = Array.Empty<KeyPropertyMapping>();
+            Items = Array.Empty<T>();
         }
     }
 }
