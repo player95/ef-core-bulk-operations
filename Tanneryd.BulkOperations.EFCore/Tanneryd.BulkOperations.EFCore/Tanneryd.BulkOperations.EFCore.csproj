@@ -11,6 +11,8 @@
     <PackageProjectUrl>https://github.com/mtanneryd/ef-core-bulk-operations</PackageProjectUrl>
     <Description>Provides bulk operations for EF Core</Description>
     <Copyright>Copyright ©  2017-2021 Tånneryd IT AB</Copyright>
+    <PackageId>Tanneryd.BulkOperations.EFCore</PackageId>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
