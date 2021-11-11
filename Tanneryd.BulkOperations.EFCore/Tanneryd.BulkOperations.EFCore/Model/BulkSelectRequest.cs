@@ -25,6 +25,7 @@ namespace Tanneryd.BulkOperations.EFCore.Model
         public BulkSelectRequest(string[] keyPropertyNames, IList<T> items = null, SqlTransaction transaction = null)
         {
             KeyPropertyMappings = KeyPropertyMapping.IdentityMappings(keyPropertyNames);
+            ColumnPropertyMappings = new KeyPropertyMapping[0];
             Items = items;
             Transaction = transaction;
         }
