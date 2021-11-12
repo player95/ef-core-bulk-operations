@@ -72,7 +72,7 @@ namespace Tanneryd.BulkOperations.EFCore
                     tableColumnMapping.EntityProperty = p;
                     tableColumnMapping.TableColumn = p.GetTableColumnMappings().First(); // When would this contain more than one entry?
                     tableColumnMapping.IsPrimaryKey = p.IsPrimaryKey();
-                    tableColumnMapping.IsIdentity = p.GetIdentityIncrement().HasValue;
+                    tableColumnMapping.IsIdentity = p.GetValueGenerationStrategy() == SqlServerValueGenerationStrategy.IdentityColumn;
                 }
 
                 var columnMappingByPropertyName = tableColumnMappings.ToDictionary(m => m.EntityProperty.Name, m => m);

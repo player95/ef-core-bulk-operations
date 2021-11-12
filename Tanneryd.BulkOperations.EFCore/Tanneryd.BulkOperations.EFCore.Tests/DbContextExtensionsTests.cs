@@ -37,7 +37,7 @@ namespace Tanneryd.BulkOperations.EFCore.Tests
             {
                 var timeout = ctx.Database.GetCommandTimeout();
                 var extractor = new MappingsExtractor(ctx);
-                extractor.GetMappings(typeof(Prime));
+                extractor.GetMappings(typeof(Course));
                 var tableName = extractor.GetTableName(ctx, typeof(Course));
                 Assert.AreEqual("dbo", tableName.Schema);
                 Assert.AreEqual("Course", tableName.Name);

@@ -2378,7 +2378,7 @@ namespace Tanneryd.BulkOperations.EFCore
 
         private static bool IsGuidProperty(dynamic p)
         {
-            var isGuid = p.ClrType == typeof(System.Guid);
+            var isGuid = p.TypeMapping.ClrType == typeof(System.Guid);
             return isGuid;
         }
 
