@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
+
+/*
+ * changed by larry.liu@grapecity.com 2022.03.11
+ * 1.追加获取更新字段数据内容和插入字段数据内容的接口
+ * 2.使用merge语句实行数据更新，提高更新性能。
+ */
+
+
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -1092,39 +1100,55 @@ namespace Tanneryd.BulkOperations.EFCore
                 //
                 // Update the target table using the temp table we just created.
                 //
+                string getUpdateStatement(string name)
+                {
+                    if (request.GetUpdateStatement == null)
+                    {
+                        return $"t1.[{name}]";
+                    }
+                    return request.GetUpdateStatement(name);
+                }
+
                 var setStatements =
-                    modifiedColumnMappings.Select(c => $"t0.[{c.TableColumn.Column.Name}] = t1.[{c.TableColumn.Column.Name}]");
+                    modifiedColumnMappings.Select(c => $"t0.[{c.TableColumn.Column.Name}] = {getUpdateStatement(c.TableColumn.Column.Name)}");
                 var setStatementsSql = string.Join(" , ", setStatements);
                 var conditionStatements =
                     selectedKeyMappings.Select(c => $"t0.[{c.TableColumn.Column.Name}] = t1.[{c.TableColumn.Column.Name}]");
                 var conditionStatementsSql = string.Join(" AND ", conditionStatements);
-                var cmdBody = $@"UPDATE t0 SET {setStatementsSql}
-                                 FROM {tableName.Fullname} AS t0
-                                 INNER JOIN {tempTableName} AS t1 ON {conditionStatementsSql}
+
+                var cmdBody = $@"
+                                 MERGE  {tableName.Fullname} t0
+                                 USING  {tempTableName} t1
+                                 ON  {conditionStatementsSql}
+                                 WHEN MATCHED    
+                                 THEN UPDATE SET {setStatementsSql}
                                 ";
-                var cmd = CreateSqlCommand(cmdBody, conn, request.Transaction, request.CommandTimeout);
-                rowsAffected += cmd.ExecuteNonQuery();
 
                 if (request.InsertIfNew)
                 {
                     var columns = columnMappings.Values
-                        .Where(m => !primaryKeyMembers.Contains(m.TableColumn.Column.Name))
-                        .Select(m => m.TableColumn.Column.Name)
-                        .ToArray();
+                       .Where(m => (!m.IsIdentity)&&(m.TableColumn.Column.IsStored??false))
+                       .Select(m => m.TableColumn.Column.Name)
+                       .ToArray();
+                    string getInsertStatement(string name) 
+                    {
+                        if (request.GetInsertStatement == null)
+                        {
+                            return $"t1.[{name}]";
+                        }
+                        return request.GetInsertStatement(name);
+                    };
                     var columnNames = string.Join(",", columns.Select(c => $"[{c}]"));
-                    var t0ColumnNames = string.Join(",", columns.Select(c => $"[t0].[{c}]"));
-                    cmdBody = $@"INSERT INTO {tableName.Fullname}
-                             SELECT {columnNames}
-                             FROM {tempTableName}
-                             EXCEPT
-                             SELECT {t0ColumnNames}
-                             FROM {tempTableName} AS t0
-                             INNER JOIN {tableName.Fullname} AS t1 ON {conditionStatementsSql}            
-                            ";
-                    cmd = CreateSqlCommand(cmdBody, conn, request.Transaction, request.CommandTimeout);
-                    rowsAffected += cmd.ExecuteNonQuery();
-                }
+                    var t0ColumnNames = string.Join(",", columns.Select(c => $"{getInsertStatement(c)}"));
+                    cmdBody = $@"
+                                 {cmdBody}
+                                 WHEN NOT MATCHED 
+                                 then INSERT ({columnNames}) values({t0ColumnNames})
+                                ";
 
+                }
+                var cmd = CreateSqlCommand(cmdBody, conn, request.Transaction, request.CommandTimeout);
+                rowsAffected += cmd.ExecuteNonQuery();
                 //
                 // Clean up. Delete the temp table.
                 //
@@ -1484,7 +1508,7 @@ namespace Tanneryd.BulkOperations.EFCore
 
         private static string[] GetPrimaryKeyMembers(Dictionary<string, TableColumnMapping> columnMappings)
         {
-            return columnMappings.Values.Where(v=>v.IsPrimaryKey).Select(v=>v.TableColumn.Column.Name).ToArray();
+            return columnMappings.Values.Where(v=>v.IsPrimaryKey && v.IsIdentity).Select(v=>v.TableColumn.Column.Name).ToArray();
         }
 
         private static TableColumnMapping[] GetPrimaryKeyColumnMappings(DbContext ctx, Type t,

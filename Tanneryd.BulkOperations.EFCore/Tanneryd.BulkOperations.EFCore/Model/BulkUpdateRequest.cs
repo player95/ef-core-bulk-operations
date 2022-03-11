@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/*
+ * changed by larry.liu@grapecity.com 2022.03.11
+ * 追加获取更新字段数据内容和插入字段数据内容的接口
+ */
+
 using System;
 using System.Collections;
 using Microsoft.Data.SqlClient;
@@ -35,5 +40,7 @@ namespace Tanneryd.BulkOperations.EFCore.Model
         public SqlTransaction Transaction { get; set; }
         public bool InsertIfNew { get; set; }
         public TimeSpan CommandTimeout { get; set; } = TimeSpan.FromMinutes(30);
+        public Func<String, string> GetUpdateStatement { get; set; }
+        public Func<String, string> GetInsertStatement { get; set; }
     }
 }
